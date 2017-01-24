@@ -7,7 +7,7 @@ import java.util.Collections;
 /**
  * Created by Veronica on 1/22/2017.
  */
-public class Balance implements Cloneable {
+public class Balance implements Cloneable, Comparable {
     private ArrayList<Workstation> workstationList;
     private BalanceType type;
     private double time;
@@ -28,12 +28,12 @@ public class Balance implements Cloneable {
 
     public Balance(Balance balance) {
         this.amountOfWorkstations = balance.getAmountOfWorkstations();
-        this.amountOfEmptyWorkstations = amountOfWorkstations;
         workstationList = new ArrayList<Workstation>(amountOfWorkstations);
         for(int i = 0; i < amountOfWorkstations; i++) {
             workstationList.add(new Workstation(balance.getWorkstationList().get(i)));
         }
         this.time = balance.getTime();
+        this.amountOfEmptyWorkstations = balance.getAmountOfEmptyWorkstations();
     }
 
     public ArrayList<Workstation> getWorkstationList() {
@@ -92,8 +92,8 @@ public class Balance implements Cloneable {
         this.amountOfWorkstations = amountOfWorkstations;
     }
 
-    public void setGoalFunction(double goalFunction) {
-        this.goalFunction = goalFunction;
+    public void setGoalFunction() {
+        this.goalFunction = this.amountOfWorkstations*this.time;
     }
 
     public void setRadius(double radius) {
@@ -101,9 +101,13 @@ public class Balance implements Cloneable {
     }
 
     public void addWork(int index, int work, double time) {
-        this.workstationList.get(index).addWork(work,time);
-        if(this.workstationList.get(index).getTime() > this.time) {
-            this.time = this.workstationList.get(index).getTime();
+        Workstation workstation = this.workstationList.get(index);
+        if(workstation.getWorkList().isEmpty()) {
+            this.amountOfEmptyWorkstations--;
+        }
+        workstation.addWork(work,time);
+        if(workstation.getTime() > this.time) {
+            this.time = workstation.getTime();
         }
     }
 
@@ -132,5 +136,19 @@ public class Balance implements Cloneable {
                 ", goalFunction=" + goalFunction +
                 ", radius=" + radius +
                 '}';
+    }
+
+
+    @Override
+    public int compareTo(Object o) {
+        if(this.time > ((Balance)o).getTime()) {
+            return 1;
+        } else {
+            if(this.time < ((Balance)o).getTime()) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
     }
 }
