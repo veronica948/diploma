@@ -17,6 +17,7 @@ public class Workstation {
     public Workstation(ArrayList<Integer> workList, double time) {
         this.workList = workList;
         this.time = time;
+
     }
 
     public Workstation(Workstation workstation) {
@@ -25,6 +26,7 @@ public class Workstation {
             this.workList.add(workstation.getWorkList().get(i));
         }
         this.time = workstation.getTime();
+        this.containMutualWork = workstation.isContainMutualWork();
     }
 
     public ArrayList<Integer> getWorkList() {
@@ -55,9 +57,12 @@ public class Workstation {
         workList.add(work);
     }
 
-    public void addWork(int work, double time) {
+    public void addWork(int work, double time, boolean isMutual) {
         this.time = this.time + time;
         workList.add(work);
+        if(isMutual) {
+            this.containMutualWork = true;
+        }
     }
 
     @Override

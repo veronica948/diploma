@@ -47,6 +47,10 @@ public class Task {
              mBalanceList.clear();
             for(int n = 1; n <= amountOfWorks; n++) {
                 ArrayList<Integer> prev = previousWork.get(n-1);
+                boolean isMutual = false;
+                if(n <= amountOfMutualWorks) {
+                    isMutual = true;
+                }
                 if(n != 1) {
                     currentList = new ArrayList<Balance>(mBalanceList.size());
                     for(int t = 0; t < mBalanceList.size(); t++) {
@@ -57,7 +61,7 @@ public class Task {
                         int k = findWorkstation(currentList.get(j),prev);
                         for(int l = k; l <= m; l++) {
                             Balance b = new Balance(currentList.get(j));
-                            b.addWork(l-1, n, workTimeList[n-1]);
+                            b.addWork(l-1, n, workTimeList[n-1], isMutual);
                             if(n == amountOfWorks) {
                                 int emptyAmount = b.getAmountOfEmptyWorkstations();
                                 if(emptyAmount == 0) {
@@ -72,7 +76,7 @@ public class Task {
                 } else {
                     for(int l = 0; l < m; l++) {
                         Balance b = new Balance(m);
-                        b.addWork(l, n, workTimeList[n-1]);
+                        b.addWork(l, n, workTimeList[n-1], isMutual);
                         mBalanceList.add(b);
                     }
                 }
@@ -80,7 +84,7 @@ public class Task {
             balanceList.addAll(mBalanceList);
         }
         Collections.sort(balanceList, new Comparator<Balance>() {
-            @Override
+
             public int compare(Balance o1, Balance o2) {
                 if(o1.getGoalFunction() > o2.getGoalFunction()) {
                     return 1;

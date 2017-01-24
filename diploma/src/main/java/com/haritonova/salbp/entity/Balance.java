@@ -100,12 +100,12 @@ public class Balance implements Cloneable, Comparable {
         this.radius = radius;
     }
 
-    public void addWork(int index, int work, double time) {
+    public void addWork(int index, int work, double time, boolean isMutual) {
         Workstation workstation = this.workstationList.get(index);
         if(workstation.getWorkList().isEmpty()) {
             this.amountOfEmptyWorkstations--;
         }
-        workstation.addWork(work,time);
+        workstation.addWork(work,time, isMutual);
         if(workstation.getTime() > this.time) {
             this.time = workstation.getTime();
         }
@@ -138,8 +138,6 @@ public class Balance implements Cloneable, Comparable {
                 '}';
     }
 
-
-    @Override
     public int compareTo(Object o) {
         if(this.time > ((Balance)o).getTime()) {
             return 1;
