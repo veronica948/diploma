@@ -16,6 +16,7 @@ public class Task {
     private ArrayList<Balance> balanceList;
     private ArrayList<Balance> optimalBalanceList;
     private ArrayList<ArrayList<Integer>> previousWork;
+    private int amountOfFeasibleBalances;
 
     public Task(int maxTime, int maxWorkstationAmount, int amountOfMutualWorks,
                 int amountOfWorks, double[] workTimeList) {
@@ -66,6 +67,11 @@ public class Task {
                                 int emptyAmount = b.getAmountOfEmptyWorkstations();
                                 if(emptyAmount == 0) {
                                     b.setGoalFunction();
+                                    if(b.getGoalFunction() > maxTime) {
+                                        b.setType(BalanceType.QUASIFEASIBLE);
+                                    } else {
+                                        b.setType(BalanceType.FEASIBLE);
+                                    }
                                     mBalanceList.add(b);
                                 }
                             } else {
@@ -132,6 +138,20 @@ public class Task {
         return this.getOptimalBalanceList();
     }
 
+    public int countFeasibleAmount() {
+        int quasifeasibleAmount = 0;
+        for(int i = this.balanceList.size() - 1; i >= 0 ; i--) {
+            Balance balance = this.balanceList.get(i);
+            if(balance.getGoalFunction() > maxTime) {
+                quasifeasibleAmount++;
+            } else {
+                break;
+            }
+        }
+        this.amountOfFeasibleBalances = this.balanceList.size() - quasifeasibleAmount;
+        return amountOfFeasibleBalances;
+    }
+
     public void solveTask() {
 
     }
@@ -166,5 +186,13 @@ public class Task {
 
     public ArrayList<ArrayList<Integer>> getPreviousWork() {
         return previousWork;
+    }
+
+    public int getAmountOfFeasibleBalances() {
+        return amountOfFeasibleBalances;
+    }
+
+    public void setAmountOfFeasibleBalances(int amountOfFeasibleBalances) {
+        this.amountOfFeasibleBalances = amountOfFeasibleBalances;
     }
 }

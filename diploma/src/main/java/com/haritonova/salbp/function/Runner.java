@@ -23,5 +23,7 @@ public class Runner {
         System.out.println(optimalBalances.get(0));
         System.out.println(optimalBalances.get(1));
         System.out.println(optimalBalances.get(2));
+        System.out.println(task.countFeasibleAmount());
+        System.out.println(balances.get(98));
     }
 }
