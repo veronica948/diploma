@@ -9,15 +9,11 @@ public class Workstation {
     private ArrayList<Integer> workList;
     private double time;
     private boolean containMutualWork;
+    private ArrayList<Integer> mutualWorkList;
 
     public Workstation() {
         workList = new ArrayList<Integer>();
-    }
-
-    public Workstation(ArrayList<Integer> workList, double time) {
-        this.workList = workList;
-        this.time = time;
-
+        mutualWorkList = new ArrayList<Integer>();
     }
 
     public Workstation(Workstation workstation) {
@@ -27,6 +23,10 @@ public class Workstation {
         }
         this.time = workstation.getTime();
         this.containMutualWork = workstation.isContainMutualWork();
+        this.mutualWorkList = new ArrayList<Integer>(workstation.getMutualWorkList().size());
+        for(int i = 0; i < workstation.getMutualWorkList().size(); i++) {
+            this.mutualWorkList.add(workstation.getMutualWorkList().get(i));
+        }
     }
 
     public ArrayList<Integer> getWorkList() {
@@ -62,7 +62,16 @@ public class Workstation {
         workList.add(work);
         if(isMutual) {
             this.containMutualWork = true;
+            this.mutualWorkList.add(work);
         }
+    }
+
+    public ArrayList<Integer> getMutualWorkList() {
+        return mutualWorkList;
+    }
+
+    public void setMutualWorkList(ArrayList<Integer> mutualWorkList) {
+        this.mutualWorkList = mutualWorkList;
     }
 
     @Override
@@ -70,6 +79,10 @@ public class Workstation {
         String workString = "";
         for(int i = 0; i < workList.size(); i++) {
             workString += workList.get(i) + " ";
+        }
+        workString += " Mutual: ";
+        for(int i = 0; i < mutualWorkList.size(); i++) {
+            workString += mutualWorkList.get(i) + " ";
         }
         return "Workstation{" +
                 "workList=" + workString +
