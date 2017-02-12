@@ -9,16 +9,12 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by Veronica on 1/24/2017.
- */
-
 public class TaskTest {
     @Test
     public void testBalances() {
         double [] workTimeList = {3,2,1};
         int[][] edges = {{1,3}};
-        Task task = new Task(30,3,2,3, workTimeList, edges);
+        Task task = new Task(30,2,3, workTimeList, edges);
 
         ArrayList<Balance> balances = task.buildBalances();
         System.out.println(balances.size());
@@ -29,7 +25,7 @@ public class TaskTest {
     public void testOptimalBalances() {
         double [] workTimeList = {3,2,1};
         int[][] edges = {{1,3}};
-        Task task = new Task(30,3,2,3, workTimeList, edges);
+        Task task = new Task(30,2,3, workTimeList, edges);
         task.buildBalances();
         ArrayList<Balance> optimalBalances = task.findOptimalBalances();
         assertEquals(1, optimalBalances.size());

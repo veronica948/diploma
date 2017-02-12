@@ -2,18 +2,15 @@ package com.haritonova.salbp.entity;
 
 import java.util.ArrayList;
 
-/**
- * Created by Veronica on 1/22/2017.
- */
 public class Workstation {
     private ArrayList<Integer> workList;
     private double time;
-    private boolean containMutualWork;
-    private ArrayList<Integer> mutualWorkList;
+    private boolean containsManualWork;
+    private ArrayList<Integer> manualWorkList;
 
     public Workstation() {
         workList = new ArrayList<Integer>();
-        mutualWorkList = new ArrayList<Integer>();
+        manualWorkList = new ArrayList<Integer>();
     }
 
     public Workstation(Workstation workstation) {
@@ -22,10 +19,10 @@ public class Workstation {
             this.workList.add(workstation.getWorkList().get(i));
         }
         this.time = workstation.getTime();
-        this.containMutualWork = workstation.isContainMutualWork();
-        this.mutualWorkList = new ArrayList<Integer>(workstation.getMutualWorkList().size());
-        for(int i = 0; i < workstation.getMutualWorkList().size(); i++) {
-            this.mutualWorkList.add(workstation.getMutualWorkList().get(i));
+        this.containsManualWork = workstation.doesContainManualWork();
+        this.manualWorkList = new ArrayList<Integer>(workstation.getManualWorkList().size());
+        for(int i = 0; i < workstation.getManualWorkList().size(); i++) {
+            this.manualWorkList.add(workstation.getManualWorkList().get(i));
         }
     }
 
@@ -45,33 +42,33 @@ public class Workstation {
         this.time = time;
     }
 
-    public boolean isContainMutualWork() {
-        return containMutualWork;
+    public boolean doesContainManualWork() {
+        return containsManualWork;
     }
 
-    public void setContainMutualWork(boolean containMutualWork) {
-        this.containMutualWork = containMutualWork;
+    public void setContainsManualWork(boolean containsManualWork) {
+        this.containsManualWork = containsManualWork;
     }
 
     public void addWork(int work) {
         workList.add(work);
     }
 
-    public void addWork(int work, double time, boolean isMutual) {
+    public void addWork(int work, double time, boolean isManual) {
         this.time = this.time + time;
         workList.add(work);
-        if(isMutual) {
-            this.containMutualWork = true;
-            this.mutualWorkList.add(work);
+        if(isManual) {
+            this.containsManualWork = true;
+            this.manualWorkList.add(work);
         }
     }
 
-    public ArrayList<Integer> getMutualWorkList() {
-        return mutualWorkList;
+    public ArrayList<Integer> getManualWorkList() {
+        return manualWorkList;
     }
 
-    public void setMutualWorkList(ArrayList<Integer> mutualWorkList) {
-        this.mutualWorkList = mutualWorkList;
+    public void setManualWorkList(ArrayList<Integer> manualWorkList) {
+        this.manualWorkList = manualWorkList;
     }
 
     @Override
@@ -81,13 +78,13 @@ public class Workstation {
             workString += workList.get(i) + " ";
         }
         workString += " Mutual: ";
-        for(int i = 0; i < mutualWorkList.size(); i++) {
-            workString += mutualWorkList.get(i) + " ";
+        for(int i = 0; i < manualWorkList.size(); i++) {
+            workString += manualWorkList.get(i) + " ";
         }
         return "Workstation{" +
                 "workList=" + workString +
                 ", time=" + time +
-                ", containMutualWork=" + containMutualWork +
+                ", containsManualWork=" + containsManualWork +
                 '}';
     }
 }

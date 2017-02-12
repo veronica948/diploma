@@ -4,41 +4,29 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-/**
- * Created by Veronica on 1/22/2017.
- */
 public class Task {
     private int maxTime;
-    private int maxWorkstationAmount;
-    private int amountOfMutualWorks;
+    private int amountOfManualWorks;
     private int amountOfWorks;
     private double[] workTimeList;
     private ArrayList<Balance> balanceList;
     private ArrayList<Balance> optimalBalanceList;
     private ArrayList<ArrayList<Integer>> previousWork;
-    private ArrayList<ArrayList<Integer>> pastWork;
     private int amountOfFeasibleBalances;
     int[][] edges;
 
-    public Task(int maxTime, int maxWorkstationAmount, int amountOfMutualWorks,
+    public Task(int maxTime,  int amountOfManualWorks,
                 int amountOfWorks, double[] workTimeList, int[][] edges) {
         this.maxTime = maxTime;
-        this.maxWorkstationAmount = maxWorkstationAmount;
-        this.amountOfMutualWorks = amountOfMutualWorks;
+        this.amountOfManualWorks = amountOfManualWorks;
         this.amountOfWorks = amountOfWorks;
         this.workTimeList = workTimeList;
         this.previousWork = new ArrayList<ArrayList<Integer>>(amountOfWorks);
         for(int i = 0; i < amountOfWorks; i++) {
             previousWork.add(i, new ArrayList<Integer>());
         }
-
-        this.pastWork = new ArrayList<ArrayList<Integer>>(amountOfWorks);
-        for(int i = 0; i < amountOfWorks; i++) {
-            pastWork.add(i, new ArrayList<Integer>());
-        }
         this.edges = edges;
         this.formPreviousWork(edges);
-        formPastWork(edges);
     }
 
     public void formPreviousWork(int[][] edges) {
@@ -62,28 +50,17 @@ public class Task {
 
     }
 
-    public void formPastWork(int[][] edges) {
-        System.out.println("edges.length" + edges.length);
-        for(int i = 0; i < edges.length; i++) {
-            int past = edges[i][1];
-            System.out.println(edges[i][0]);
-            pastWork.get(edges[i][0] - 1).add(past);
-            pastWork.get(edges[i][0] - 1).addAll(pastWork.get(past - 1));
-        }
-        System.out.println("Past works = " + pastWork);
-    }
-
     public ArrayList<Balance> buildBalances() {
         balanceList = new ArrayList<Balance>();
         ArrayList<Balance> mBalanceList = new ArrayList<Balance>();
         ArrayList<Balance> currentList;
-         for(int m = 2; m <= maxWorkstationAmount; m++) {
+         for(int m = 2; m <= amountOfWorks; m++) {
             mBalanceList.clear();
             for(int n = 1; n <= amountOfWorks; n++) {
                 ArrayList<Integer> prev = previousWork.get(n-1);
-                boolean isMutual = false;
-                if(n <= amountOfMutualWorks) {
-                    isMutual = true;
+                boolean isManual = false;
+                if(n <= amountOfManualWorks) {
+                    isManual = true;
                 }
                 if(n != 1) {
                     currentList = new ArrayList<Balance>(mBalanceList.size());
@@ -95,7 +72,7 @@ public class Task {
                         int[] k = findWorkstation(currentList.get(j),prev, n, m);
                         for(int l = k[0]; l <= k[1]; l++) {
                             Balance b = new Balance(currentList.get(j));
-                            b.addWork(l-1, n, workTimeList[n-1], isMutual);
+                            b.addWork(l-1, n, workTimeList[n-1], isManual);
                             if(n == amountOfWorks) {
                                 int emptyAmount = b.getAmountOfEmptyWorkstations();
                                 if(emptyAmount == 0) {
@@ -115,7 +92,7 @@ public class Task {
                 } else {
                     for(int l = 0; l < m; l++) {
                         Balance b = new Balance(m);
-                        b.addWork(l, n, workTimeList[n-1], isMutual);
+                        b.addWork(l, n, workTimeList[n-1], isManual);
                         mBalanceList.add(b);
                     }
                 }
@@ -196,7 +173,7 @@ public class Task {
     public void findW() {
         for(int i = 0; i < optimalBalanceList.size(); i++) {
             Balance balance = optimalBalanceList.get(i);
-            balance.findMutualMostLoaded();
+            balance.findManualMostLoaded();
         }
     }
 
@@ -242,12 +219,8 @@ public class Task {
         return maxTime;
     }
 
-    public int getMaxWorkstationAmount() {
-        return maxWorkstationAmount;
-    }
-
-    public int getAmountOfMutualWorks() {
-        return amountOfMutualWorks;
+    public int getAmountOfManualWorks() {
+        return amountOfManualWorks;
     }
 
     public int getAmountOfWorks() {

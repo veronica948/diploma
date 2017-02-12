@@ -1,12 +1,8 @@
 package com.haritonova.salbp.entity;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
-/**
- * Created by Veronica on 1/22/2017.
- */
 public class Balance implements Cloneable, Comparable {
     private ArrayList<Workstation> workstationList;
     private BalanceType type;
@@ -98,12 +94,12 @@ public class Balance implements Cloneable, Comparable {
         this.radius = radius;
     }
 
-    public void addWork(int index, int work, double time, boolean isMutual) {
+    public void addWork(int index, int work, double time, boolean isManual) {
         Workstation workstation = this.workstationList.get(index);
         if(workstation.getWorkList().isEmpty()) {
             this.amountOfEmptyWorkstations--;
         }
-        workstation.addWork(work,time, isMutual);
+        workstation.addWork(work, time, isManual);
         if(workstation.getTime() > this.time) {
             this.mostLoadedWorkstations.clear();
             this.mostLoadedWorkstations.add(index + 1);
@@ -113,16 +109,6 @@ public class Balance implements Cloneable, Comparable {
                 this.mostLoadedWorkstations.add(index + 1);
             }
         }
-
-    }
-
-    @Override
-    protected Balance clone() throws CloneNotSupportedException {
-        Balance newBalance = (Balance)super.clone();
-        newBalance.setWorkstationList(new ArrayList<Workstation>(this.getWorkstationList().size()));
-        Collections.copy(newBalance.getWorkstationList(), this.getWorkstationList());
-        newBalance.setAmountOfWorkstations(this.amountOfWorkstations);
-        return newBalance;
     }
 
     @Override
@@ -171,13 +157,13 @@ public class Balance implements Cloneable, Comparable {
         this.mostLoadedWorkstations = mostLoadedWorkstations;
     }
 
-    public ArrayList<ArrayList<Integer>>findMutualMostLoaded() {
+    public ArrayList<ArrayList<Integer>> findManualMostLoaded() {
         w = new ArrayList<ArrayList<Integer>>(mostLoadedWorkstations.size());
         for(int i = 0; i < mostLoadedWorkstations.size(); i++) {
             Workstation workstation = workstationList.get(mostLoadedWorkstations.get(i) - 1);
-            if(workstation.isContainMutualWork()) {
-                System.out.println(workstation.getMutualWorkList());
-                w.add(workstation.getMutualWorkList());
+            if(workstation.doesContainManualWork()) {
+                System.out.println(workstation.getManualWorkList());
+                w.add(workstation.getManualWorkList());
             } else {
                 w.add(null);
             }
