@@ -259,6 +259,13 @@ public class Task {
 
     //m0 = m
     public double calculateSameWorkstationNumberRadius(Balance balance1, Balance balance2) {
+        for(Workstation workstation1 : balance1.getWorkstationList()) {
+            //choose min
+            for(Workstation workstation2 : balance2.getWorkstationList()) {
+                //count number for each workstation;
+                //choose max;
+            }
+        }
         return 0;
     }
 
