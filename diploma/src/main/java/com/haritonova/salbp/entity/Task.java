@@ -251,4 +251,63 @@ public class Task {
         this.amountOfFeasibleBalances = amountOfFeasibleBalances;
     }
 
+    /*
+     * Находится e-окрестность, при попадании
+     * в которую баланс перестает быть оптимальный
+     * в сранении с данным балансом
+     */
+
+    //m0 = m
+    public double calculateSameWorkstationNumberRadius(Balance balance1, Balance balance2) {
+        return 0;
+    }
+
+    //m0 > m
+    public double calculateMoreWorkstationNumberRadius(Balance balance1, Balance balance2) {
+        return 0;
+    }
+
+    //m0 < m
+    public double estimateLessWorkstationNumberRadius(Balance balance1, Balance balance2) {
+        return 0;
+    }
+
+    public double estimateRadius(Balance balance) {
+        if(balance.getRadius() == 0  || balance.getRadius() == Double.POSITIVE_INFINITY) {
+            return balance.getRadius();
+        }
+        double radius1 = Double.POSITIVE_INFINITY; // m0 = m
+        double radius2  = Double.POSITIVE_INFINITY; //m0 > m
+        double radius3  = Double.POSITIVE_INFINITY; // m0 < m
+        double r;
+        int workstationAmount = balance.getAmountOfWorkstations();
+        for(Balance currentBalance : balanceList) {
+            if (currentBalance.getAmountOfWorkstations() == workstationAmount) {
+                r = calculateSameWorkstationNumberRadius(balance, currentBalance);
+                if (r < radius1) {
+                    radius1 = r;
+                }
+            } else {
+                if (currentBalance.getAmountOfWorkstations() > workstationAmount) {
+                    r = calculateMoreWorkstationNumberRadius(balance, currentBalance);
+                    if (r < radius2) {
+                        radius2 = r;
+                    }
+                } else {
+                    r = estimateLessWorkstationNumberRadius(balance, currentBalance);
+                    if (r < radius3) {
+                        radius3 = r;
+                    }
+                }
+            }
+        }
+        ArrayList<Double> list = new ArrayList<Double>(3);
+        list.add(radius1);
+        list.add(radius2);
+        list.add(radius3);
+        double radius = Collections.min(list);
+        //uncomment when everything works correct
+        //balance.setRadius(radius);
+        return radius;
+    }
 }

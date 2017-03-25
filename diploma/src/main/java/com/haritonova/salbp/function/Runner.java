@@ -49,5 +49,11 @@ public class Runner {
         for (int i = 0; i < optimalBalances.size(); i++) {
             System.out.println(optimalBalances.get(i));
         }
+        //estimate radius
+        System.out.println("ESTIMATE RADIUS OPTIMAL BALANCES");
+        for (Balance balance : optimalBalances) {
+            task.estimateRadius(balance);
+            System.out.println(balance.getRadius());
+        }
     }
 }
