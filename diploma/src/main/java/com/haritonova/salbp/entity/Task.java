@@ -1,8 +1,8 @@
 package com.haritonova.salbp.entity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import com.haritonova.salbp.util.MapUtil;
+
+import java.util.*;
 
 public class Task {
     private int maxTime;
@@ -259,23 +259,81 @@ public class Task {
 
     //m0 = m
     public double calculateSameWorkstationNumberRadius(Balance balance1, Balance balance2) {
+        double current;
+        double currentMaxWorkstation;
+        double currentMinBalance = Double.POSITIVE_INFINITY;
+        boolean isConsidered;
         for(Workstation workstation1 : balance1.getWorkstationList()) {
             //choose min
+            System.out.println("workstation1 = " + workstation1);
+
+            currentMaxWorkstation = Double.NEGATIVE_INFINITY;
+            isConsidered = false;
             for(Workstation workstation2 : balance2.getWorkstationList()) {
                 //count number for each workstation;
-                //choose max;
+                System.out.println("workstation2 = " + workstation2);
+                if(workstation2.getTime() <= workstation1.getTime()) {
+                    continue;
+                }
+                ArrayList<Integer> works1 = new ArrayList<Integer>(workstation1.getManualWorkList().size());
+                for(Integer work : workstation1.getManualWorkList()) {
+                    works1.add(work);
+                }
+                ArrayList<Integer> works2 = new ArrayList<Integer>(workstation2.getManualWorkList().size());
+                for(Integer work : workstation2.getManualWorkList()) {
+                    works2.add(work);
+                }
+                works1.removeAll(workstation2.getManualWorkList());
+                works2.removeAll(workstation1.getManualWorkList());
+                ArrayList<Integer> difference = new ArrayList<Integer>();
+                difference.addAll(works1);
+                difference.addAll(works2);
+                ArrayList<Double> sortedManualWorks = new ArrayList<Double>(works2.size());
+                for(Integer work : works2) {
+                    sortedManualWorks.add(workTimeList[work - 1]);
+                }
+                Collections.sort(sortedManualWorks);
+                if (difference.size() != 0) {
+                    isConsidered = true;
+                    double max = (workstation2.getTime() - workstation1.getTime()) / (difference.size());
+                    double sum = 0;
+                    double counter = 0;
+                    for(Double entry : sortedManualWorks) {
+                        System.out.println("entry: " + entry);
+                        sum += entry;
+                        counter++;
+                        current = (workstation2.getTime() - workstation1.getTime() - sum) / (difference.size() - counter);
+                        if(current > max) {
+                            max = current;
+                        } else {
+                            break;
+                        }
+
+                    }
+                    if (currentMaxWorkstation < max) {
+                        currentMaxWorkstation = max;
+                    }
+                    System.out.println("current = " + currentMaxWorkstation);
+                }
+            }
+            if(currentMaxWorkstation < currentMinBalance && isConsidered) {
+                currentMinBalance = currentMaxWorkstation;
             }
         }
-        return 0;
+        return currentMinBalance;
     }
 
     //m0 > m
     public double calculateMoreWorkstationNumberRadius(Balance balance1, Balance balance2) {
+        int m1 = balance1.getAmountOfWorkstations();
+        int m2 = balance2.getAmountOfWorkstations();
         return 0;
     }
 
     //m0 < m
     public double estimateLessWorkstationNumberRadius(Balance balance1, Balance balance2) {
+        int m1 = balance1.getAmountOfWorkstations();
+        int m2 = balance2.getAmountOfWorkstations();
         return 0;
     }
 
@@ -289,6 +347,9 @@ public class Task {
         double r;
         int workstationAmount = balance.getAmountOfWorkstations();
         for(Balance currentBalance : balanceList) {
+            if(currentBalance.getType() == BalanceType.OPTIMAL) {
+                continue;
+            }
             if (currentBalance.getAmountOfWorkstations() == workstationAmount) {
                 r = calculateSameWorkstationNumberRadius(balance, currentBalance);
                 if (r < radius1) {
@@ -312,7 +373,11 @@ public class Task {
         list.add(radius1);
         list.add(radius2);
         list.add(radius3);
+        System.out.println("estimation1 = " + radius1);
+        System.out.println("estimation2 = " + radius2);
+        System.out.println("estimation3 = " + radius3);
         double radius = Collections.min(list);
+        System.out.println("estimation = " + radius);
         //uncomment when everything works correct
         //balance.setRadius(radius);
         return radius;
