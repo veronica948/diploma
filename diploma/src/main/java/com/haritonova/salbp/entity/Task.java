@@ -397,7 +397,7 @@ public class Task {
     public double estimateLessWorkstationNumberRadius(Balance balance1, Balance balance2) {
         int m1 = balance1.getAmountOfWorkstations();
         int m2 = balance2.getAmountOfWorkstations();
-        return 0;
+        return Double.POSITIVE_INFINITY;
     }
 
     public double estimateRadius(Balance balance) {
