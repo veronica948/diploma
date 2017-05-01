@@ -77,7 +77,7 @@ public class Workstation {
         for(int i = 0; i < workList.size(); i++) {
             workString += workList.get(i) + " ";
         }
-        workString += " Mutual: ";
+        workString += " Manual: ";
         for(int i = 0; i < manualWorkList.size(); i++) {
             workString += manualWorkList.get(i) + " ";
         }

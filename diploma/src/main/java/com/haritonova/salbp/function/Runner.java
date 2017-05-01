@@ -31,6 +31,9 @@ public class Runner {
         System.out.println("BUILD BALANCES");
         System.out.println("size = " + balances.size());
         System.out.println(balances.get(0));
+        /*for (int i = 0; i < balances.size(); i++) {
+            System.out.println(balances.get(i));
+        }*/
         ArrayList<Balance> optimalBalances = task.findOptimalBalances();
 
         System.out.println("OPTIMAL BALANCES");

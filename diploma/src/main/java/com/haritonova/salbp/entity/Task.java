@@ -186,10 +186,7 @@ public class Task {
                 }
 
                 Balance balance2 = optimalBalanceList.get(j);
-                if(balance1.getAmountOfWorkstations() != balance2.getAmountOfWorkstations()) {
-                    continue;
-                    //criteria coded below works for balances with the same amount of workstations
-                }
+
                 ArrayList<ArrayList<Integer>> balance2W = balance2.getW();
                 if(balance1W.size() > balance2W.size()) {
                     balance1.setRadius(0);
@@ -208,6 +205,24 @@ public class Task {
 
 
                     }
+                }
+
+                if(balance1.getAmountOfWorkstations() != balance2.getAmountOfWorkstations()) {
+                    if(!balance2W.contains(null)) {
+                        balance1.setRadius(0);
+                        break;
+                    }
+                }
+                if(balance1.getAmountOfWorkstations() > balance2.getAmountOfWorkstations()) {
+                    for(int t = 0; t < balance1W.size(); t++) {
+                        if(balance1W.get(t) != null) {
+                            balance1.setRadius(0);
+                            break;
+                        }
+                    }
+                }
+                if(balance1.getRadius() == 0) {
+                    break;
                 }
             }
         }
