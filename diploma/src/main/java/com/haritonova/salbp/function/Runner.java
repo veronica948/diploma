@@ -4,6 +4,7 @@ import com.haritonova.salbp.entity.Balance;
 import com.haritonova.salbp.entity.Task;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Runner {
     public static void main(String[] args) {
@@ -24,6 +25,50 @@ public class Runner {
         int[][] edges3 = {{6,2},{2,4},{4,5},{4,1}};
         Task task3 = new Task(30,3,6, workTimeList3, edges3);
         makeTask(task3);
+
+        System.out.println("1 - input your task,  2 - skip");
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(System.in);
+            int choice = scanner.nextInt();
+            if(choice != 2) {
+                System.out.println("Input number of operations");
+                int numberOfOperations = scanner.nextInt();
+                System.out.println("Input number of variable operations");
+                int numberOfManualOperations = scanner.nextInt();
+                System.out.println("Input number of edges");
+                int numberOfEdges = scanner.nextInt();
+                System.out.println("Input edges");
+                int[][] taskEdges = new int[numberOfEdges][2];
+                for (int i = 0; i < numberOfEdges; i++) {
+                    taskEdges[i][0] = scanner.nextInt();
+                    taskEdges[i][1] = scanner.nextInt();
+                }
+                System.out.println("Input time");
+                double[] workTime = new double[numberOfOperations];
+                for (int i = 0; i < numberOfOperations; i++) {
+                    workTime[i] = scanner.nextDouble();
+                }
+                /*
+                for (int i = 0; i < numberOfEdges; i++) {
+                    System.out.println(taskEdges[i][0] + " " + taskEdges[i][1]);
+                }
+                for (int i = 0; i < numberOfOperations; i++) {
+                    System.out.println(workTime[i]);
+                }
+                System.out.println(numberOfEdges);
+                */
+                Task task4 = new Task(30, numberOfManualOperations, numberOfOperations, workTime, taskEdges);
+                makeTask(task4);
+            }
+
+        } finally {
+            if(scanner != null) {
+                scanner.close();
+            }
+        }
+
+
     }
 
     public static void makeTask(Task task) {
