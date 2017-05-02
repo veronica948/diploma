@@ -381,9 +381,10 @@ public class Task {
                     sortedManualWorks.add(workTimeList[work - 1]);
                 }
                 Collections.sort(sortedManualWorks);
-                if (difference.size() != 0) {
+                if (difference.size() != 0 || intersection.size() != 0) {
                     isConsidered = true;
-                    double max = (workstation2.getTime() - workstation1.getTime()) / (difference.size());
+                    double max = (workstation2.getTime() * m2 - workstation1.getTime() * m1) /
+                            (works1.size()*m1 + (m1 - m2) * intersection.size() + (works2.size()) * m2);
                     double sum = 0;
                     double counter = 0;
                     for(Double entry : sortedManualWorks) {
@@ -403,6 +404,9 @@ public class Task {
                         currentMaxWorkstation = max;
                     }
                     System.out.println("currentMaxOnWorkstation = " + currentMaxWorkstation);
+                } else {
+                    isConsidered = false;
+                    break;
                 }
             }
             if(currentMaxWorkstation < currentMinBalance && isConsidered) {
@@ -416,7 +420,84 @@ public class Task {
     public double estimateLessWorkstationNumberRadius(Balance balance1, Balance balance2) {
         int m1 = balance1.getAmountOfWorkstations();
         int m2 = balance2.getAmountOfWorkstations();
-        return Double.POSITIVE_INFINITY;
+
+        double current;
+        double currentMaxWorkstation;
+        double currentMinBalance = Double.POSITIVE_INFINITY;
+        boolean isConsidered;
+        for(Workstation workstation1 : balance1.getWorkstationList()) {
+            //choose min
+            System.out.println("workstation1 = " + workstation1);
+
+            currentMaxWorkstation = Double.NEGATIVE_INFINITY;
+            isConsidered = false;
+            for(Workstation workstation2 : balance2.getWorkstationList()) {
+                //count number for each workstation;
+                System.out.println("workstation2 = " + workstation2);
+                if(workstation2.getTime()*m2 <= workstation1.getTime()*m1) {
+                    continue;
+                }
+                ArrayList<Integer> works1 = new ArrayList<Integer>(workstation1.getManualWorkList().size());
+                ArrayList<Integer> intersection = new ArrayList<Integer>(workstation1.getManualWorkList().size());
+                for(Integer work : workstation1.getManualWorkList()) {
+                    works1.add(work);
+                    intersection.add(work);
+                }
+                ArrayList<Integer> works2 = new ArrayList<Integer>(workstation2.getManualWorkList().size());
+                for(Integer work : workstation2.getManualWorkList()) {
+                    works2.add(work);
+                }
+                works1.removeAll(workstation2.getManualWorkList());
+                works2.removeAll(workstation1.getManualWorkList());
+                intersection.removeAll(works1);
+                ArrayList<Integer> difference = new ArrayList<Integer>();
+                difference.addAll(works1);
+                difference.addAll(works2);
+                ArrayList<Double> sortedManualWorks = new ArrayList<Double>(works2.size());
+                for(Integer work : works2) {
+                    sortedManualWorks.add(workTimeList[work - 1]);
+                }
+                Collections.sort(sortedManualWorks);
+                if (works2.size() != 0) {
+                    System.out.println("workstation2 considered = " + workstation2);
+                    isConsidered = true;
+                    double max = (workstation2.getTime() * m2 - workstation1.getTime() * m1) /
+                            ( (works2.size()) * m2);
+                    double sum = 0;
+                    double counter = 0;
+                    for(Double entry : sortedManualWorks) {
+                        System.out.println("entry: " + entry);
+                        sum += entry;
+                        counter++;
+                        current = (workstation2.getTime() * m2 - workstation1.getTime() * m1 - sum * m2) /
+                                ((works2.size() - counter) * m2);
+                        if(current > max) {
+                            max = current;
+                        } else {
+                            break;
+                        }
+                    }
+                    if(workstation2.getTime() * m2 - sum * m2 > workstation1.getTime() * m1 ) {
+                        isConsidered = false;
+                        break;
+                    }
+                    if (currentMaxWorkstation < max) {
+                        currentMaxWorkstation = max;
+                    }
+                    System.out.println("currentMaxOnWorkstation (less)= " + currentMaxWorkstation);
+                } else {
+                    isConsidered = false;
+                    break;
+                }
+            }
+            if(currentMaxWorkstation < currentMinBalance && isConsidered) {
+                currentMinBalance = currentMaxWorkstation;
+            }
+        }
+        return currentMinBalance;
+
+
+        /*return Double.POSITIVE_INFINITY;*/
     }
 
     public double estimateRadius(Balance balance) {

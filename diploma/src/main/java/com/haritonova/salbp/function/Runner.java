@@ -21,7 +21,7 @@ public class Runner {
         makeTask(task1);
 
         System.out.println("Task 3");
-        double [] workTimeList3 = {2,5,1,4,5,3};
+        double [] workTimeList3 = {2,5,2,4,5,4};
         int[][] edges3 = {{6,2},{2,4},{4,5},{4,1}};
         Task task3 = new Task(30,3,6, workTimeList3, edges3);
         makeTask(task3);
@@ -76,9 +76,11 @@ public class Runner {
         System.out.println("BUILD BALANCES");
         System.out.println("size = " + balances.size());
         System.out.println(balances.get(0));
-        /*for (int i = 0; i < balances.size(); i++) {
-            System.out.println(balances.get(i));
-        }*/
+        for (int i = 0; i < balances.size(); i++) {
+            if(balances.get(i).getAmountOfWorkstations() == 3) {
+                System.out.println(balances.get(i).getAmountOfWorkstations() + " - " + balances.get(i).getWorkstationList());
+            }
+        }
         ArrayList<Balance> optimalBalances = task.findOptimalBalances();
 
         System.out.println("OPTIMAL BALANCES");
