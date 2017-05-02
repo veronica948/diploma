@@ -425,12 +425,27 @@ public class Task {
         double currentMaxWorkstation;
         double currentMinBalance = Double.POSITIVE_INFINITY;
         boolean isConsidered;
+
+        /*double current2;
+        double currentMaxWorkstation2;
+        double currentMinBalance2 = Double.POSITIVE_INFINITY;
+        boolean isConsidered2;*/
+
+        boolean skip = false;
+        //boolean skip2 = false;
         for(Workstation workstation1 : balance1.getWorkstationList()) {
             //choose min
             System.out.println("workstation1 = " + workstation1);
 
             currentMaxWorkstation = Double.NEGATIVE_INFINITY;
             isConsidered = false;
+
+            /*currentMaxWorkstation2 = Double.NEGATIVE_INFINITY;
+            isConsidered2 = false;
+            skip2 = false;*/
+
+            skip = false;
+
             for(Workstation workstation2 : balance2.getWorkstationList()) {
                 //count number for each workstation;
                 System.out.println("workstation2 = " + workstation2);
@@ -479,20 +494,61 @@ public class Task {
                     }
                     if(workstation2.getTime() * m2 - sum * m2 > workstation1.getTime() * m1 ) {
                         isConsidered = false;
-                        break;
+                        skip = true; //break
                     }
-                    if (currentMaxWorkstation < max) {
-                        currentMaxWorkstation = max;
+                    else {
+                        if(currentMaxWorkstation < max) {
+                            currentMaxWorkstation = max;
+                        }
                     }
                     System.out.println("currentMaxOnWorkstation (less)= " + currentMaxWorkstation);
                 } else {
                     isConsidered = false;
-                    break;
+                    skip = true;//break;
                 }
+                //estimation 2
+                /*
+                if ((works2.size() + works1.size() != 0 &&
+                        m1 * (works1.size()*m1 + works2.size()*m2 + (m1-m2)*intersection.size()) > 0)) {
+                    System.out.println("workstation2 considered = " + workstation2);
+                    isConsidered2 = true;
+                    double max = (workstation2.getTime() * m2 - workstation1.getTime() * m1) /
+                            ( (works2.size()) * m1 + intersection.size()*(m1-m2) + (works2.size()) * m2);
+                    double sum = 0;
+                    double counter = 0;
+                    for(Double entry : sortedManualWorks) {
+                        System.out.println("entry: " + entry);
+                        sum += entry;
+                        counter++;
+                        current = (workstation2.getTime() * m2 - workstation1.getTime() * m1 - sum * m2) /
+                                (works2.size() * m1 + intersection.size()*(m1-m2)+ (works2.size() - counter) * m2);
+                        if(current > max) {
+                            max = current;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    //check
+
+                    if (currentMaxWorkstation2 < max) {
+                        currentMaxWorkstation2 = max;
+                    }
+                    System.out.println("currentMaxOnWorkstation2 (less)= " + currentMaxWorkstation2);
+                } else {
+                    isConsidered2 = false;
+                    skip2 = true;//break;
+                }*/
+
             }
-            if(currentMaxWorkstation < currentMinBalance && isConsidered) {
+            if(currentMaxWorkstation < currentMinBalance && isConsidered && !skip) {
                 currentMinBalance = currentMaxWorkstation;
             }
+            /*
+            if(currentMaxWorkstation2 < currentMinBalance && isConsidered2 && !skip2) {
+                //currentMinBalance = currentMaxWorkstation2;
+                System.out.println("CT" + currentMaxWorkstation2);
+            }*/
         }
         return currentMinBalance;
 
