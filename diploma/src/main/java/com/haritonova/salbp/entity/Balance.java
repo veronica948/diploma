@@ -162,7 +162,6 @@ public class Balance implements Cloneable, Comparable {
         for(int i = 0; i < mostLoadedWorkstations.size(); i++) {
             Workstation workstation = workstationList.get(mostLoadedWorkstations.get(i) - 1);
             if(workstation.doesContainManualWork()) {
-                System.out.println(workstation.getManualWorkList());
                 w.add(workstation.getManualWorkList());
             } else {
                 w.add(null);

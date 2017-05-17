@@ -49,32 +49,20 @@ public class Runner {
                 for (int i = 0; i < numberOfOperations; i++) {
                     workTime[i] = scanner.nextDouble();
                 }
-                /*
-                for (int i = 0; i < numberOfEdges; i++) {
-                    System.out.println(taskEdges[i][0] + " " + taskEdges[i][1]);
-                }
-                for (int i = 0; i < numberOfOperations; i++) {
-                    System.out.println(workTime[i]);
-                }
-                System.out.println(numberOfEdges);
-                */
                 Task task4 = new Task(30, numberOfManualOperations, numberOfOperations, workTime, taskEdges);
                 makeTask(task4);
             }
-
         } finally {
             if(scanner != null) {
                 scanner.close();
             }
         }
-
-
     }
 
     public static void makeTask(Task task) {
         ArrayList<Balance> balances = task.buildBalances();
         System.out.println("BUILD BALANCES");
-        System.out.println("size = " + balances.size());
+        System.out.println("balances amount = " + balances.size());
         System.out.println(balances.get(0));
         for (int i = 0; i < balances.size(); i++) {
             if(balances.get(i).getAmountOfWorkstations() == 3) {
@@ -84,13 +72,10 @@ public class Runner {
         ArrayList<Balance> optimalBalances = task.findOptimalBalances();
 
         System.out.println("OPTIMAL BALANCES");
-        System.out.println("size = " + optimalBalances.size());
+        System.out.println("optimal balances amount = " + optimalBalances.size());
         for (int i = 0; i < optimalBalances.size(); i++) {
             System.out.println(optimalBalances.get(i));
         }
-        System.out.println("Feasible amount = " + task.countFeasibleAmount());
-
-        System.out.println("Find w");
         task.findW();
         System.out.println("Find zero radius");
         task.findZeroRadiusBalances();
