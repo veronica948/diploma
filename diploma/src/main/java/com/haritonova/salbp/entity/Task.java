@@ -700,9 +700,11 @@ public class Task {
             System.out.println("lower bound3 = " + lowerBound3);
         }
         double radius = Collections.min(list);
-        System.out.println("estimation = " + radius);
-        if(!lessWorkstationNumberConsidered) {
+        if(lowerBound3 >= radius || !lessWorkstationNumberConsidered) {
             balance.setRadius(radius);
+            System.out.println("radius = " + radius);
+        } else {
+            System.out.println("estimation = " + radius);
         }
         return radius;
     }
