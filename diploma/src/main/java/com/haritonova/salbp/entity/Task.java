@@ -519,7 +519,7 @@ public class Task {
             }
             //check
             if(!skip2) {
-                double newTime1 = workstation1.getTime() + currentMaxWorkstation2 * m1 * workstation1.getManualWorkList().size();
+                double newTime1 = m1 * workstation1.getTime() + currentMaxWorkstation2 * m1 * workstation1.getManualWorkList().size();
                 int j = 0;
                 for (Workstation workstation22 : balance2.getWorkstationList()) {
                     double newTime2 = m2 * workstation22.getTime() + m2 * intersectionSizes[j];
@@ -555,6 +555,91 @@ public class Task {
         }
     }
 
+    //m0 < m
+    public double lowerBoundRadius(Balance balance1, Balance balance2) {
+        int m1 = balance1.getAmountOfWorkstations();
+        int m2 = balance2.getAmountOfWorkstations();
+
+        double current;
+        double currentMaxWorkstation;
+        double currentMinBalance = Double.POSITIVE_INFINITY;
+        boolean isConsidered;
+
+        boolean skip = false;
+        for(Workstation workstation1 : balance1.getWorkstationList()) {
+            currentMaxWorkstation = Double.NEGATIVE_INFINITY;
+            isConsidered = false;
+            skip = false;
+            for(Workstation workstation2 : balance2.getWorkstationList()) {
+                if(workstation2.getTime()*m2 <= workstation1.getTime()*m1) {
+                    continue;
+                }
+                ArrayList<Integer> works1 = new ArrayList<Integer>(workstation1.getManualWorkList().size());
+                ArrayList<Integer> intersection = new ArrayList<Integer>(workstation1.getManualWorkList().size());
+                for(Integer work : workstation1.getManualWorkList()) {
+                    works1.add(work);
+                    intersection.add(work);
+                }
+                ArrayList<Integer> works2 = new ArrayList<Integer>(workstation2.getManualWorkList().size());
+                for(Integer work : workstation2.getManualWorkList()) {
+                    works2.add(work);
+                }
+                works1.removeAll(workstation2.getManualWorkList()); //difference 1
+                works2.removeAll(workstation1.getManualWorkList()); //difference 2
+                intersection.removeAll(works1);
+                ArrayList<Double> sortedManualWorks = new ArrayList<Double>(workstation2.getManualWorkList().size());
+                for(Integer work : workstation2.getManualWorkList()) {
+                    sortedManualWorks.add(workTimeList[work - 1]);
+                }
+                Collections.sort(sortedManualWorks);
+                if (sortedManualWorks.size() + works1.size() != 0) {
+                    isConsidered = true;
+                    double max = (workstation2.getTime() * m2 - workstation1.getTime() * m1) /
+                            ( (works1.size()) * m1 + intersection.size()*(m2-m1) + (works2.size()) * m2);
+                    double sum1 = 0;
+                    double sum2 = 0;
+                    double counter1 = 0;
+                    double counter2 = 0;
+                    for(Double entry : sortedManualWorks) {
+                        if(intersection.contains(entry)) {
+                            sum1 += entry;
+                            counter1++;
+                        } else {
+                            sum2 += entry;
+                            counter2++;
+                        }
+                        current = (workstation2.getTime() * m2 - workstation1.getTime() * m1 - sum2 * m2 - sum1 * (m2-m1)) /
+                                (works2.size() * m1 + (intersection.size() - counter1)*(m2-m1)+ (works2.size() - counter2) * m2);
+
+                        if(current > max) {
+                            max = current;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (currentMaxWorkstation < max) {
+                        currentMaxWorkstation = max;
+                    }
+                } else {
+                    isConsidered = false;
+                    skip = true;
+                }
+            }
+            if(currentMaxWorkstation == Double.POSITIVE_INFINITY) {
+                skip = true;
+            }
+            if(!skip && isConsidered) {
+                System.out.println("lower bound works for station " + workstation1);
+                System.out.println("and balance " + balance2);
+                System.out.println(" = " + currentMaxWorkstation);
+            }
+            if(currentMaxWorkstation < currentMinBalance && isConsidered && !skip) {
+                currentMinBalance = currentMaxWorkstation;
+            }
+        }
+        return currentMinBalance;
+    }
+
     public double estimateRadius(Balance balance) {
         if(balance.getRadius() == 0  || balance.getRadius() == Double.POSITIVE_INFINITY) {
             return balance.getRadius();
@@ -563,6 +648,8 @@ public class Task {
         double radius2  = Double.POSITIVE_INFINITY; //m0 > m
         double radius3  = Double.POSITIVE_INFINITY; // m0 < m
         double r;
+        double lowerBound3 = Double.POSITIVE_INFINITY;
+        double l;
         int workstationAmount = balance.getAmountOfWorkstations();
         boolean sameWorkstationNumberConsidered = false;
         boolean moreWorkstationNumberConsidered = false;
@@ -588,8 +675,12 @@ public class Task {
                 } else {
                     lessWorkstationNumberConsidered = true;
                     r = estimateLessWorkstationNumberRadius(balance, currentBalance);
+                    l = lowerBoundRadius(balance, currentBalance);
                     if (r < radius3) {
                         radius3 = r;
+                    }
+                    if (l < lowerBound3) {
+                        lowerBound3 = l;
                     }
                 }
             }
@@ -606,6 +697,7 @@ public class Task {
         if(lessWorkstationNumberConsidered) {
             System.out.println("estimation3 = " + radius3);
             list.add(radius3);
+            System.out.println("lower bound3 = " + lowerBound3);
         }
         double radius = Collections.min(list);
         System.out.println("estimation = " + radius);
