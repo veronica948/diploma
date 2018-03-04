@@ -316,8 +316,8 @@ public class Task {
         return currentMinBalance;
     }
 
-    //m0 > m
-    public double calculateMoreWorkstationNumberRadius(Balance balance1, Balance balance2) {
+    //m0 >= m
+    public double calculateMoreEqualWorkstationNumberRadius(Balance balance1, Balance balance2) {
         int m1 = balance1.getAmountOfWorkstations();
         int m2 = balance2.getAmountOfWorkstations();
         double current;
@@ -377,6 +377,11 @@ public class Task {
                     isConsidered = false;
                     break;
                 }
+            }
+            if(isConsidered) {
+                System.out.println("bound1 works for station " + workstation1);
+                System.out.println("and balance " + balance2);
+                System.out.println(" = " + currentMaxWorkstation);
             }
             if(currentMaxWorkstation < currentMinBalance && isConsidered) {
                 currentMinBalance = currentMaxWorkstation;
@@ -555,6 +560,67 @@ public class Task {
         }
     }
 
+    public double estimateLessWorkstationNumberRadius2(Balance balance1, Balance balance2) {
+        int m1 = balance1.getAmountOfWorkstations();
+        int m2 = balance2.getAmountOfWorkstations();
+        double currentMaxWorkstation;
+        double currentMinBalance = Double.POSITIVE_INFINITY;
+        boolean isConsidered;
+        boolean skip = false;
+        for(Workstation workstation1 : balance1.getWorkstationList()) {
+            currentMaxWorkstation = Double.NEGATIVE_INFINITY;
+            isConsidered = false;
+            skip = false;
+            int[] intersectionSizes = new int[balance2.getWorkstationList().size()];
+            int i = 0;
+            for(Workstation workstation2 : balance2.getWorkstationList()) {
+                ArrayList<Integer> works1 = new ArrayList<Integer>(workstation1.getManualWorkList().size());
+                ArrayList<Integer> intersection = new ArrayList<Integer>(workstation1.getManualWorkList().size());
+                for(Integer work : workstation1.getManualWorkList()) {
+                    works1.add(work);
+                    intersection.add(work);
+                }
+                ArrayList<Integer> works2 = new ArrayList<Integer>(workstation2.getManualWorkList().size());
+                for(Integer work : workstation2.getManualWorkList()) {
+                    works2.add(work);
+                }
+                works1.removeAll(workstation2.getManualWorkList());
+                works2.removeAll(workstation1.getManualWorkList());
+                intersection.removeAll(works1);
+                intersectionSizes[i] = intersection.size();
+                i++;
+
+                //estimation
+                if (works1.size()*m1 + (m1-m2)*intersection.size() > 0) {
+                    isConsidered = true;
+                    double max = (workstation2.getTime() * m2 - workstation1.getTime() * m1) /
+                            ( (works1.size()) * m1 + intersection.size()*(m1-m2));
+                    if (currentMaxWorkstation < max) {
+                        currentMaxWorkstation = max;
+                    }
+                } else {
+                    isConsidered = false;
+                    skip = true;
+                }
+            }
+            if(currentMaxWorkstation == Double.POSITIVE_INFINITY) {
+                skip = true;
+            }
+
+            if(!skip && isConsidered) {
+                System.out.println("upperBound2 works for station " + workstation1);
+                System.out.println("and balance " + balance2);
+                System.out.println(" = " + currentMaxWorkstation);
+            } else {
+                System.out.println("skip");
+            }
+            if(currentMaxWorkstation < currentMinBalance && isConsidered && !skip) {
+                currentMinBalance = currentMaxWorkstation;
+            }
+        }
+        return currentMinBalance;
+    }
+
     //m0 < m
     public double lowerBoundRadius(Balance balance1, Balance balance2) {
         int m1 = balance1.getAmountOfWorkstations();
@@ -640,72 +706,61 @@ public class Task {
         return currentMinBalance;
     }
 
-    public double estimateRadius(Balance balance) {
+    public void estimateRadius(Balance balance) {
         if(balance.getRadius() == 0  || balance.getRadius() == Double.POSITIVE_INFINITY) {
-            return balance.getRadius();
+            return;
         }
-        double radius1 = Double.POSITIVE_INFINITY; // m0 = m
-        double radius2  = Double.POSITIVE_INFINITY; //m0 > m
-        double radius3  = Double.POSITIVE_INFINITY; // m0 < m
+        double bound1  = Double.POSITIVE_INFINITY; //m0 >= m
+        double upperBound2  = Double.POSITIVE_INFINITY; // m0 < m
         double r;
-        double lowerBound3 = Double.POSITIVE_INFINITY;
+        double lowerBound2 = Double.POSITIVE_INFINITY; // m0 < m
         double l;
         int workstationAmount = balance.getAmountOfWorkstations();
-        boolean sameWorkstationNumberConsidered = false;
-        boolean moreWorkstationNumberConsidered = false;
+        boolean moreEqualWorkstationNumberConsidered = false;
         boolean lessWorkstationNumberConsidered = false;
 
         for(Balance currentBalance : balanceList) {
             if(currentBalance.getType() == BalanceType.OPTIMAL) {
                 continue;
             }
-            if (currentBalance.getAmountOfWorkstations() == workstationAmount) {
-                sameWorkstationNumberConsidered = true;
-                r = calculateSameWorkstationNumberRadius(balance, currentBalance);
-                if (r < radius1) {
-                    radius1 = r;
-                }
-            } else {
-                if (currentBalance.getAmountOfWorkstations() < workstationAmount) {
-                    moreWorkstationNumberConsidered = true;
-                    r = calculateMoreWorkstationNumberRadius(balance, currentBalance);
-                    if (r < radius2) {
-                        radius2 = r;
+             if (currentBalance.getAmountOfWorkstations() <= workstationAmount) {
+                    moreEqualWorkstationNumberConsidered = true;
+                    r = calculateMoreEqualWorkstationNumberRadius(balance, currentBalance);
+                    if (r < bound1) {
+                        bound1 = r;
                     }
-                } else {
+              } else {
                     lessWorkstationNumberConsidered = true;
-                    r = estimateLessWorkstationNumberRadius(balance, currentBalance);
+                    r = estimateLessWorkstationNumberRadius2(balance, currentBalance);
                     l = lowerBoundRadius(balance, currentBalance);
-                    if (r < radius3) {
-                        radius3 = r;
+                    if (r < upperBound2) {
+                        upperBound2 = r;
                     }
-                    if (l < lowerBound3) {
-                        lowerBound3 = l;
+                    if (l < lowerBound2) {
+                        lowerBound2 = l;
                     }
-                }
-            }
+              }
         }
-        ArrayList<Double> list = new ArrayList<Double>(3);
-        if(sameWorkstationNumberConsidered) {
-            System.out.println("estimation1 = " + radius1);
-            list.add(radius1);
-        }
-        if(moreWorkstationNumberConsidered) {
-            System.out.println("estimation2 = " + radius2);
-            list.add(radius2);
+        ArrayList<Double> listUpperBound = new ArrayList<Double>(2);
+        ArrayList<Double> listLowerBound = new ArrayList<Double>(2);
+        if(moreEqualWorkstationNumberConsidered) {
+            System.out.println("bound 1 = " + bound1);
+            listUpperBound.add(bound1);
+            listLowerBound.add(bound1);
         }
         if(lessWorkstationNumberConsidered) {
-            System.out.println("estimation3 = " + radius3);
-            list.add(radius3);
-            System.out.println("lower bound3 = " + lowerBound3);
+            System.out.println("upper bound2 = " + upperBound2);
+            listUpperBound.add(upperBound2);
+            System.out.println("lower bound2 = " + lowerBound2);
+            listLowerBound.add(lowerBound2);
         }
-        double radius = Collections.min(list);
-        if(lowerBound3 >= radius || !lessWorkstationNumberConsidered) {
-            balance.setRadius(radius);
-            System.out.println("radius = " + radius);
-        } else {
-            System.out.println("estimation = " + radius);
+        double upperBound = Collections.min(listUpperBound);
+        double lowerBound = Collections.min(listLowerBound);
+        System.out.println("upper bound = " + upperBound);
+        System.out.println("lower bound = " + lowerBound);
+        if(upperBound == lowerBound) {
+            balance.setRadius(upperBound);
+            System.out.println("radius = " + upperBound);
         }
-        return radius;
     }
 }
